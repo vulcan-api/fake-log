@@ -43,20 +43,20 @@ router.all('/App', (_req: Request, res: Response) => {
   res.render('uczenplus/app');
 });
 
-router.all('/api/Context', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/Context.json'));
+router.all('/api/Context', async(_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/Context.json')).default);
 });
 
-router.all('/api/Cache', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/Cache.json'));
+router.all('/api/Cache', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/Cache.json')).default);
 });
 
-router.all('/api/OkresyKlasyfikacyjne', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/OkresyKlasyfikacyjne.json'));
+router.all('/api/OkresyKlasyfikacyjne', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/OkresyKlasyfikacyjne.json')).default);
 });
 
-router.all('/api/Zebrania', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/Zebrania.json'));
+router.all('/api/Zebrania', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/Zebrania.json')).default);
 });
 
 router.all('/api/SprawdzianyZadaniaDomowe', async (_req: Request, res: Response) => {
@@ -68,64 +68,64 @@ router.all('/api/SprawdzianyZadaniaDomowe', async (_req: Request, res: Response)
   );
 });
 
-router.all('/api/SprawdzianSzczegoly', (_req: Request, res: Response) => {
-  const data = require('../../data/uonetplus-uczenplus/SprawdzianSzczegoly.json');
+router.all('/api/SprawdzianSzczegoly', async (_req: Request, res: Response) => {
+  const data = (await import('../../data/uonetplus-uczenplus/SprawdzianSzczegoly.json')).default;
   data.data = new Date().toISOString();
   res.json(data);
 });
 
-router.all('/api/ZadanieDomoweSzczegoly', (_req: Request, res: Response) => {
-  const data = require('../../data/uonetplus-uczenplus/ZadanieDomoweSzczegoly.json');
+router.all('/api/ZadanieDomoweSzczegoly', async (_req: Request, res: Response) => {
+  const data = (await import('../../data/uonetplus-uczenplus/ZadanieDomoweSzczegoly.json')).default;
   data.data = new Date().toISOString();
   res.json(data);
 });
 
-router.all('/api/Oceny', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/Oceny.json'));
+router.all('/api/Oceny', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/Oceny.json')).default);
 });
 
-router.all('/api/Frekwencja', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/Frekwencja.json'));
+router.all('/api/Frekwencja', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/Frekwencja.json')).default);
 });
 
-router.all('/api/Uwagi', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/Uwagi.json'));
+router.all('/api/Uwagi', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/Uwagi.json')).default);
 });
 
-router.all('/api/Nauczyciele', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/Nauczyciele.json'));
+router.all('/api/Nauczyciele', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/Nauczyciele.json')).default);
 });
 
-router.all('/api/Informacje', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/Informacje.json'));
+router.all('/api/Informacje', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/Informacje.json')).default);
 });
 
 router.all('/api/WiadomosciNieodczytane', (_req: Request, res: Response) => {
   res.json({ liczbaNieodczytanychWiadomosci: 2 });
 });
 
-router.all('/api/DostepOffice', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/DostepOffice.json'));
+router.all('/api/DostepOffice', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/DostepOffice.json')).default);
 });
 
-router.all('/api/ZarejestrowaneUrzadzenia', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/ZarejestrowaneUrzadzenia.json'));
+router.all('/api/ZarejestrowaneUrzadzenia', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/ZarejestrowaneUrzadzenia.json')).default);
 });
 
-router.all('/api/PodrecznikiLataSzkolne', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/PodrecznikiLataSzkolne.json'));
+router.all('/api/PodrecznikiLataSzkolne', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/PodrecznikiLataSzkolne.json')).default);
 });
 
-router.all('/api/SzczesliwyNumerTablica', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/SzczesliwyNumerTablica.json'));
+router.all('/api/SzczesliwyNumerTablica', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/SzczesliwyNumerTablica.json')).default);
 });
 
-router.all('/api/WazneDzisiajTablica', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/WazneDzisiajTablica.json'));
+router.all('/api/WazneDzisiajTablica', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/WazneDzisiajTablica.json')).default);
 });
 
-router.all('/api/WychowawcyTablica', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/WychowawcyTablica.json'));
+router.all('/api/WychowawcyTablica', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/WychowawcyTablica.json')).default);
 });
 
 router.all('/api/RealizacjaZajec', async (_req: Request, res: Response) => {
@@ -137,12 +137,12 @@ router.all('/api/RealizacjaZajec', async (_req: Request, res: Response) => {
   );
 });
 
-router.all('/api/PlanZajec', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/PlanZajec.json'));
+router.all('/api/PlanZajec', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/PlanZajec.json')).default);
 });
 
-router.all('/api/DniWolne', (_req: Request, res: Response) => {
-  res.json(require('../../data/uonetplus-uczenplus/DniWolne.json'));
+router.all('/api/DniWolne', async (_req: Request, res: Response) => {
+  res.json((await import('../../data/uonetplus-uczenplus/DniWolne.json')).default);
 });
 
 router.all('/api/*', (_req: Request, res: Response) => {

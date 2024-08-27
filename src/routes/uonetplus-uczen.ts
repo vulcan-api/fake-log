@@ -724,8 +724,8 @@ router.all('/Pomoc.mvc/Get', (req: Request, res: Response) => {
   });
 });
 
-router.all('/RejestracjaUrzadzeniaToken.mvc/Get', (req: Request, res: Response) => {
-  const student = require('../../data/api/ListaUczniow')[1];
+router.all('/RejestracjaUrzadzeniaToken.mvc/Get', async (req: Request, res: Response) => {
+  const student = (await import('../../data/api/ListaUczniow.json')).default[1];
   const base = protocol(req) + '://' + req.get('host');
   const token = new Tokens({ secretLength: 97, saltLength: 4 });
   const secret = token.secretSync();
@@ -804,11 +804,11 @@ router.all('/Sprawdziany.mvc/Get', async (req: Request, res: Response) => {
   });
 });
 
-router.all('/Statystyki.mvc/GetOcenyCzastkowe', (req: Request, res: Response) => {
+router.all('/Statystyki.mvc/GetOcenyCzastkowe', async (req: Request, res: Response) => {
   let average = 2.0;
   let studentAverage = 3.0;
   res.json({
-    data: _.chain(require('../../data/opiekun/oceny-statystyki-czastkowe'))
+    data: _.chain((await import('../../data/opiekun/oceny-statystyki-czastkowe.json')).default)
       .groupBy('subject')
       .map((series, subject) => ({ subject, series }))
       .value()
@@ -844,9 +844,9 @@ router.all('/Statystyki.mvc/GetOcenyCzastkowe', (req: Request, res: Response) =>
   });
 });
 
-router.all('/Statystyki.mvc/GetOcenyRoczne', (req: Request, res: Response) => {
+router.all('/Statystyki.mvc/GetOcenyRoczne', async (req: Request, res: Response) => {
   res.json({
-    data: _.chain(require('../../data/opiekun/oceny-statystyki-roczne'))
+    data: _.chain((await import('../../data/opiekun/oceny-statystyki-roczne.json')).default)
       .groupBy('subject')
       .map((series, subject) => ({ subject, series }))
       .value()
@@ -909,16 +909,16 @@ router.all('/SzkolaINauczyciele.mvc/Get', async (req: Request, res: Response) =>
   });
 });
 
-router.all('/Uczen.mvc/Get', (req: Request, res: Response) => {
+router.all('/Uczen.mvc/Get', async (req: Request, res: Response) => {
   res.json({
-    data: require('../../data/opiekun/uczen.json'),
+    data: (await import('../../data/opiekun/uczen.json')).default,
     success: true,
   });
 });
 
-router.all('/UczenZdjecie.mvc/Get', (req: Request, res: Response) => {
+router.all('/UczenZdjecie.mvc/Get', async (req: Request, res: Response) => {
   res.json({
-    data: require('../../data/opiekun/uczen-zdjecie.json'),
+    data: (await import('../../data/opiekun/uczen-zdjecie.json')).default,
     success: true,
   });
 });
@@ -1030,16 +1030,16 @@ router.all('/Homework.mvc/Get', async (req: Request, res: Response) => {
   });
 });
 
-router.all('/Zebrania.mvc/Get', (req: Request, res: Response) => {
+router.all('/Zebrania.mvc/Get', async (req: Request, res: Response) => {
   res.json({
-    data: require('../../data/opiekun/zebrania'),
+    data: (await import('../../data/opiekun/zebrania.json')).default,
     success: true,
   });
 });
 
-router.all('/ZarejestrowaneUrzadzenia.mvc/Get', (req: Request, res: Response) => {
+router.all('/ZarejestrowaneUrzadzenia.mvc/Get', async (req: Request, res: Response) => {
   res.json({
-    data: require('../../data/opiekun/zarejestrowane-urzadzenia'),
+    data: (await import('../../data/opiekun/zarejestrowane-urzadzenia.json')).default,
     success: true,
   });
 });

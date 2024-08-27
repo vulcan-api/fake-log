@@ -117,8 +117,8 @@ router.get('/api/Skrzynki', async (req: Request, res: Response) => {
   );
 });
 
-router.all('/api/WiadomoscSzczegoly', (req: Request, res: Response) => {
-  const message = require('../../data/api/messages/WiadomosciOdebrane')[0];
+router.all('/api/WiadomoscSzczegoly', async (req: Request, res: Response) => {
+  const message = (await import('../../data/api/messages/WiadomosciOdebrane.json')).default[0];
   res.json({
     data: converter.timestampToIsoTzFormat(message.DataWyslaniaUnixEpoch),
     apiGlobalKey: fromString(message.WiadomoscId.toString()),
@@ -145,9 +145,9 @@ router.all('/api/WiadomoscSzczegoly', (req: Request, res: Response) => {
   });
 });
 
-router.all('/api/WiadomoscOdpowiedzPrzekaz', (req: Request, res: Response) => {
-  const user = require('../../data/api/ListaUczniow')[1];
-  const message = require('../../data/api/messages/WiadomosciOdebrane')[0];
+router.all('/api/WiadomoscOdpowiedzPrzekaz', async (req: Request, res: Response) => {
+  const user = (await import('../../data/api/ListaUczniow.json')).default[1];
+  const message = (await import('../../data/api/messages/WiadomosciOdebrane.json')).default[0];
   res.json({
     data: converter.timestampToIsoTzFormat(message.DataWyslaniaUnixEpoch),
     apiGlobalKey: fromString(message.WiadomoscId.toString()),
