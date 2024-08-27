@@ -1,9 +1,11 @@
-const router = require('express').Router({});
-const protocol = require('../../utils/connection');
-const { getUnixTime, format } = require('date-fns');
-const api = require('../../utils/api');
+import { format, getUnixTime } from 'date-fns';
+import { Request, Response, Router } from 'express';
+import studentData from '../../../data/api/ListaUczniow.json';
+import api from '../../utils/api';
+import protocol from '../../utils/connection';
+const router = Router({});
 
-router.all('/Certyfikat', (req, res) => {
+router.all('/Certyfikat', (req: Request, res: Response) => {
   const base = protocol(req) + '://' + req.get('host');
 
   // key gen
@@ -31,12 +33,12 @@ router.all('/Certyfikat', (req, res) => {
   });
 });
 
-router.all('/ListaUczniow', (req, res) => {
+router.all('/ListaUczniow', (req: Request, res: Response) => {
   const currDate = new Date();
 
-  let semesterNumber;
-  let semesterStart;
-  let semesterEnd;
+  let semesterNumber: number;
+  let semesterStart: Date;
+  let semesterEnd: Date;
   if (currDate.getMonth() >= 8) {
     semesterNumber = 1;
     semesterStart = new Date(currDate.getFullYear(), 8, 1);
@@ -49,7 +51,7 @@ router.all('/ListaUczniow', (req, res) => {
 
   res.json(
     api.createResponse(
-      require('../../../data/api/ListaUczniow').map((item) => {
+      studentData.map((item) => {
         return {
           ...item,
           OkresNumer: semesterNumber,
@@ -63,4 +65,4 @@ router.all('/ListaUczniow', (req, res) => {
   );
 });
 
-module.exports = router;
+export default router;

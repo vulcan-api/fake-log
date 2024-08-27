@@ -1,20 +1,24 @@
-const router = require('express').Router({});
-const { createEnvelope } = require('./utils');
-const { format } = require('date-fns');
-const { uuid } = require('uuidv4');
-const { getByValue } = require('./../../utils/dictMap');
+import { createEnvelope } from './utils';
+import { format } from 'date-fns';
+import { uuid } from 'uuidv4';
+import { getByValue } from './../../utils/dictMap';
+import { Router, Request, Response } from 'express';
 
-router.get('/grade/byPupil', (req, res) => {
-  const subjects = require('../../../data/api/dictionaries/Przedmioty');
-  const categories = require('../../../data/api/dictionaries/KategorieOcen');
-  const teachers = require('../../../data/api/dictionaries/Nauczyciele');
+// Doing static imports since the json data is not too much, hence the impact, if any, is likely to be minimal
+import subjects from '../../../data/api/dictionaries/Przedmioty.json';
+import categories from '../../../data/api/dictionaries/KategorieOcen.json';
+import teachers from '../../../data/api/dictionaries/Nauczyciele.json';
+import grades from '../../../data/api/student/Oceny.json';
 
+const router = Router({});
+
+router.get('/grade/byPupil', (req: Request, res: Response) => {
   res.json(
     createEnvelope(
       0,
       'OK',
       'IEnumerable`1',
-      require('../../../data/api/student/Oceny').map((item) => {
+      grades.map((item) => {
         return {
           Column: {
             Category: {
@@ -77,7 +81,7 @@ router.get('/grade/byPupil', (req, res) => {
   );
 });
 
-router.all('/lucky', (req, res) => {
+router.all('/lucky', (req: Request, res: Response) => {
   res.json(
     createEnvelope(0, 'OK', 'LuckyNumberPayload', {
       Day: format(new Date(), 'yyyy-MM-dd'),
@@ -86,4 +90,4 @@ router.all('/lucky', (req, res) => {
   );
 });
 
-module.exports = router;
+export default router;

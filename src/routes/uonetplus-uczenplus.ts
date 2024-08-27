@@ -1,9 +1,9 @@
-const { Router } = require('express');
-const protocol = require('../utils/connection');
+import { Request, Response, Router } from 'express';
+import protocol from '../utils/connection';
 
 const router = Router();
 
-router.get('/', (req, res) => {
+router.get('/', (req: Request, res: Response) => {
   const base = protocol(req) + '://' + req.get('host') + '/powiatwulkanowy/123456';
   res.json({
     loginEndpoint: base + '/LoginEndpoint.aspx',
@@ -35,118 +35,118 @@ router.get('/', (req, res) => {
   });
 });
 
-router.all('/LoginEndpoint.aspx', (req, res) => {
+router.all('/LoginEndpoint.aspx', (req: Request, res: Response) => {
   res.redirect(protocol(req) + '://' + req.get('host') + '/powiatwulkanowy/123456/App');
 });
 
-router.all('/App', (_req, res) => {
+router.all('/App', (_req: Request, res: Response) => {
   res.render('uczenplus/app');
 });
 
-router.all('/api/Context', (_req, res) => {
+router.all('/api/Context', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/Context.json'));
 });
 
-router.all('/api/Cache', (_req, res) => {
+router.all('/api/Cache', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/Cache.json'));
 });
 
-router.all('/api/OkresyKlasyfikacyjne', (_req, res) => {
+router.all('/api/OkresyKlasyfikacyjne', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/OkresyKlasyfikacyjne.json'));
 });
 
-router.all('/api/Zebrania', (_req, res) => {
+router.all('/api/Zebrania', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/Zebrania.json'));
 });
 
-router.all('/api/SprawdzianyZadaniaDomowe', (_req, res) => {
+router.all('/api/SprawdzianyZadaniaDomowe', async (_req: Request, res: Response) => {
   res.json(
-    require('../../data/uonetplus-uczenplus/SprawdzianyZadaniaDomowe.json').map((event) => {
+    (await import('../../data/uonetplus-uczenplus/SprawdzianyZadaniaDomowe.json')).default.map((event) => {
       event.data = new Date().toISOString();
       return event;
     })
   );
 });
 
-router.all('/api/SprawdzianSzczegoly', (_req, res) => {
+router.all('/api/SprawdzianSzczegoly', (_req: Request, res: Response) => {
   const data = require('../../data/uonetplus-uczenplus/SprawdzianSzczegoly.json');
   data.data = new Date().toISOString();
   res.json(data);
 });
 
-router.all('/api/ZadanieDomoweSzczegoly', (_req, res) => {
+router.all('/api/ZadanieDomoweSzczegoly', (_req: Request, res: Response) => {
   const data = require('../../data/uonetplus-uczenplus/ZadanieDomoweSzczegoly.json');
   data.data = new Date().toISOString();
   res.json(data);
 });
 
-router.all('/api/Oceny', (_req, res) => {
+router.all('/api/Oceny', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/Oceny.json'));
 });
 
-router.all('/api/Frekwencja', (_req, res) => {
+router.all('/api/Frekwencja', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/Frekwencja.json'));
 });
 
-router.all('/api/Uwagi', (_req, res) => {
+router.all('/api/Uwagi', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/Uwagi.json'));
 });
 
-router.all('/api/Nauczyciele', (_req, res) => {
+router.all('/api/Nauczyciele', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/Nauczyciele.json'));
 });
 
-router.all('/api/Informacje', (_req, res) => {
+router.all('/api/Informacje', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/Informacje.json'));
 });
 
-router.all('/api/WiadomosciNieodczytane', (_req, res) => {
+router.all('/api/WiadomosciNieodczytane', (_req: Request, res: Response) => {
   res.json({ liczbaNieodczytanychWiadomosci: 2 });
 });
 
-router.all('/api/DostepOffice', (_req, res) => {
+router.all('/api/DostepOffice', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/DostepOffice.json'));
 });
 
-router.all('/api/ZarejestrowaneUrzadzenia', (_req, res) => {
+router.all('/api/ZarejestrowaneUrzadzenia', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/ZarejestrowaneUrzadzenia.json'));
 });
 
-router.all('/api/PodrecznikiLataSzkolne', (_req, res) => {
+router.all('/api/PodrecznikiLataSzkolne', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/PodrecznikiLataSzkolne.json'));
 });
 
-router.all('/api/SzczesliwyNumerTablica', (_req, res) => {
+router.all('/api/SzczesliwyNumerTablica', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/SzczesliwyNumerTablica.json'));
 });
 
-router.all('/api/WazneDzisiajTablica', (_req, res) => {
+router.all('/api/WazneDzisiajTablica', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/WazneDzisiajTablica.json'));
 });
 
-router.all('/api/WychowawcyTablica', (_req, res) => {
+router.all('/api/WychowawcyTablica', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/WychowawcyTablica.json'));
 });
 
-router.all('/api/RealizacjaZajec', (_req, res) => {
+router.all('/api/RealizacjaZajec', async (_req: Request, res: Response) => {
   res.json(
-    require('../../data/uonetplus-uczenplus/RealizacjaZajec.json').map((lesson) => {
+    (await import('../../data/uonetplus-uczenplus/RealizacjaZajec.json')).default.map((lesson) => {
       lesson.data = new Date().toISOString();
       return lesson;
     })
   );
 });
 
-router.all('/api/PlanZajec', (_req, res) => {
+router.all('/api/PlanZajec', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/PlanZajec.json'));
 });
 
-router.all('/api/DniWolne', (_req, res) => {
+router.all('/api/DniWolne', (_req: Request, res: Response) => {
   res.json(require('../../data/uonetplus-uczenplus/DniWolne.json'));
 });
 
-router.all('/api/*', (_req, res) => {
+router.all('/api/*', (_req: Request, res: Response) => {
   res.status(404).send({ message: 'Nie odnaleziono zasobu.' });
 });
 
-module.exports = router;
+export default router;

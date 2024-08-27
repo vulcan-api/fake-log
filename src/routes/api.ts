@@ -1,8 +1,9 @@
-const router = require('express').Router();
-const protocol = require('../utils/connection');
-const { format } = require('date-fns');
+import { format } from 'date-fns';
+import { Request, Response, Router } from 'express';
+import protocol from '../utils/connection';
 
-router.all('/', (req, res) => {
+const router = Router();
+router.all('/', (req: Request, res: Response) => {
   const today = format(new Date(), 'yyyy-MM-dd');
 
   let base = protocol(req) + '://' + req.get('host');
@@ -45,22 +46,22 @@ router.all('/', (req, res) => {
 });
 
 // v3
-router.use('/powiatwulkanowy/mobile-api/Uczen.v3.UczenStart', require('./mobile-api/register'));
-router.use('/powiatwulkanowy/123456/mobile-api/Uczen.v3.Uczen', require('./mobile-api/student'));
-router.use('/powiatwulkanowy/123456/mobile-api/Uczen.v3.Uczen', require('./mobile-api/messages'));
-router.use('/powiatwulkanowy/123456/mobile-api/Push.v1.Push', require('./mobile-api/push'));
+router.use('/powiatwulkanowy/mobile-api/Uczen.v3.UczenStart', require('./mobile-api/register').default);
+router.use('/powiatwulkanowy/123456/mobile-api/Uczen.v3.Uczen', require('./mobile-api/student').default);
+router.use('/powiatwulkanowy/123456/mobile-api/Uczen.v3.Uczen', require('./mobile-api/messages').default);
+router.use('/powiatwulkanowy/123456/mobile-api/Push.v1.Push', require('./mobile-api/push').default);
 
 // hebe
-router.use('/powiatwulkanowy/api/mobile/register', require('./api/register'));
-router.use('/powiatwulkanowy/123456/api/mobile/register', require('./api/register'));
-router.use('/powiatwulkanowy/123456/api/mobile', require('./api/student'));
-router.use('/powiatwulkanowy/123456/api/mobile/school', require('./api/school'));
+router.use('/powiatwulkanowy/api/mobile/register', require('./api/register').default);
+router.use('/powiatwulkanowy/123456/api/mobile/register', require('./api/register').default);
+router.use('/powiatwulkanowy/123456/api/mobile', require('./api/student').default);
+router.use('/powiatwulkanowy/123456/api/mobile/school', require('./api/school').default);
 
-router.all('/*', (req, res) => {
+router.all('/*', (req: Request, res: Response) => {
   res.status(404).json({
     status: 'error',
     message: 'Not implemented yet',
   });
 });
 
-module.exports = router;
+export default router;

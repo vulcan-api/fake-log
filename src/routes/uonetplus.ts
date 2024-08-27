@@ -1,8 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const protocol = require('../utils/connection');
+import { Router, Request, Response } from 'express';
+import protocol from '../utils/connection';
+const router = Router();
 
-router.get('/powiatwulkanowy/Start.mvc/Endpoints', (req, res) => {
+router.get('/powiatwulkanowy/Start.mvc/Endpoints', (req: Request, res: Response) => {
   const base = protocol(req) + '://' + req.get('host') + '/powiatwulkanowy/Start.mvc';
   res.json({
     status: 'success',
@@ -28,7 +28,7 @@ router.get('/powiatwulkanowy/Start.mvc/Endpoints', (req, res) => {
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetSelfGovernments', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetSelfGovernments', (req: Request, res: Response) => {
   res.json({
     data: require('../../data/uonetplus/GetSelfGovernments'),
     success: true,
@@ -37,7 +37,7 @@ router.all('/powiatwulkanowy/Start.mvc/GetSelfGovernments', (req, res) => {
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetStudentTrips', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetStudentTrips', (req: Request, res: Response) => {
   res.json({
     data: require('../../data/uonetplus/GetStudentTrips'),
     success: true,
@@ -46,19 +46,19 @@ router.all('/powiatwulkanowy/Start.mvc/GetStudentTrips', (req, res) => {
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetLastNotes', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetLastNotes', (req: Request, res: Response) => {
   res.json(require('../../data/uonetplus/GetLastNotes'));
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetFreeDays', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetFreeDays', (req: Request, res: Response) => {
   res.json(require('../../data/uonetplus/GetFreeDays'));
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetKidsLuckyNumbers', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetKidsLuckyNumbers', (req: Request, res: Response) => {
   res.json(require('../../data/uonetplus/GetKidsLuckyNumbers'));
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetKidsLessonPlan', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetKidsLessonPlan', (req: Request, res: Response) => {
   res.json({
     data: require('../../data/uonetplus/GetKidsLessonPlan'),
     success: true,
@@ -67,7 +67,7 @@ router.all('/powiatwulkanowy/Start.mvc/GetKidsLessonPlan', (req, res) => {
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetNumberOfUnreadMessages', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetNumberOfUnreadMessages', (req: Request, res: Response) => {
   res.json({
     data: [],
     success: false,
@@ -76,7 +76,7 @@ router.all('/powiatwulkanowy/Start.mvc/GetNumberOfUnreadMessages', (req, res) =>
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetLastHomeworks', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetLastHomeworks', (req: Request, res: Response) => {
   res.json({
     data: require('../../data/uonetplus/GetLastHomeworks'),
     success: true,
@@ -85,7 +85,7 @@ router.all('/powiatwulkanowy/Start.mvc/GetLastHomeworks', (req, res) => {
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetLastTests', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetLastTests', (req: Request, res: Response) => {
   res.json({
     data: require('../../data/uonetplus/GetLastTests'),
     success: true,
@@ -94,7 +94,7 @@ router.all('/powiatwulkanowy/Start.mvc/GetLastTests', (req, res) => {
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetStudentConferences', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetStudentConferences', (req: Request, res: Response) => {
   res.json({
     data: [],
     success: false,
@@ -103,7 +103,7 @@ router.all('/powiatwulkanowy/Start.mvc/GetStudentConferences', (req, res) => {
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetLastStudentLessons', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetLastStudentLessons', (req: Request, res: Response) => {
   res.json({
     data: require('../../data/uonetplus/GetLastStudentLessons'),
     success: true,
@@ -112,7 +112,7 @@ router.all('/powiatwulkanowy/Start.mvc/GetLastStudentLessons', (req, res) => {
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetStudentDirectorInformations', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetStudentDirectorInformations', (req: Request, res: Response) => {
   res.json({
     data: require('../../data/uonetplus/GetStudentDirectorInformations'),
     errorMessage: null,
@@ -121,7 +121,7 @@ router.all('/powiatwulkanowy/Start.mvc/GetStudentDirectorInformations', (req, re
   });
 });
 
-router.all('/powiatwulkanowy/Start.mvc/GetLastAnnouncements', (req, res) => {
+router.all('/powiatwulkanowy/Start.mvc/GetLastAnnouncements', (req: Request, res: Response) => {
   res.json({
     data: require('../../data/uonetplus/GetLastAnnouncements'),
     errorMessage: null,
@@ -130,14 +130,14 @@ router.all('/powiatwulkanowy/Start.mvc/GetLastAnnouncements', (req, res) => {
   });
 });
 
-router.get('/', (req, res) => {
+router.get('/', (req: Request, res: Response) => {
   res.render('log-exception', {
     title: 'Dziennik FakeUONET+',
     message: 'Podany identyfikator klienta jest niepoprawny.',
   });
 });
 
-router.all(/^\/([a-z0-9]+)(?:\/LoginEndpoint\.aspx|\/)?$/i, (req, res) => {
+router.all(/^\/([a-z0-9]+)(?:\/LoginEndpoint\.aspx|\/)?$/i, (req: Request, res: Response) => {
   let hasCert = req.body.wa && req.body.wresult;
 
   if (req.params[0] != 'powiatwulkanowy') {
@@ -156,17 +156,17 @@ router.all(/^\/([a-z0-9]+)(?:\/LoginEndpoint\.aspx|\/)?$/i, (req, res) => {
     return res.redirect('/powiatwulkanowy/Start.mvc/Index');
   }
 
-  res.redirect(protocol(req) + '://' + req.get('host').replace('uonetplus', 'cufs') + '/powiatwulkanowy/Account/LogOn');
+  res.redirect(protocol(req) + '://' + req.get('host')!.replace('uonetplus', 'cufs') + '/powiatwulkanowy/Account/LogOn');
 });
 
-router.get(['/powiatwulkanowy/Start.mvc', '/powiatwulkanowy/Start.mvc/Index'], (req, res) => {
+router.get(['/powiatwulkanowy/Start.mvc', '/powiatwulkanowy/Start.mvc/Index'], (req: Request, res: Response) => {
   res.render('homepage', {
     title: 'Uonet+',
-    uonetplusOpiekun: protocol(req) + '://' + req.get('host').replace('uonetplus', 'uonetplus-opiekun'),
-    uonetplusUczen: protocol(req) + '://' + req.get('host').replace('uonetplus', 'uonetplus-uczen'),
-    uonetplusUczenplus: protocol(req) + '://' + req.get('host').replace('uonetplus', 'uonetplus-uczenplus'),
-    uonetplusWiadomosciplus: protocol(req) + '://' + req.get('host').replace('uonetplus', 'uonetplus-wiadomosciplus'),
+    uonetplusOpiekun: protocol(req) + '://' + req.get('host')!.replace('uonetplus', 'uonetplus-opiekun'),
+    uonetplusUczen: protocol(req) + '://' + req.get('host')!.replace('uonetplus', 'uonetplus-uczen'),
+    uonetplusUczenplus: protocol(req) + '://' + req.get('host')!.replace('uonetplus', 'uonetplus-uczenplus'),
+    uonetplusWiadomosciplus: protocol(req) + '://' + req.get('host')!.replace('uonetplus', 'uonetplus-wiadomosciplus'),
   });
 });
 
-module.exports = router;
+export default router;

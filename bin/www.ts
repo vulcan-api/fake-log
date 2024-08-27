@@ -3,9 +3,10 @@
 /**
  * Module dependencies.
  */
-const app = require('../app')
-const debug = require('debug')('fake-log:server')
-const http = require('http')
+import app from '../app'
+import debug from 'debug'
+// ('fake-log:server')
+import http from 'http'
 
 /**
  * Get port from environment and store in Express.
@@ -28,7 +29,7 @@ server.on('listening', onListening)
 /**
  * Normalize a port into a number, string, or false.
  */
-function normalizePort(val) {
+function normalizePort(val: string) {
   let port = parseInt(val, 10)
 
   if (isNaN(port)) {
@@ -47,7 +48,7 @@ function normalizePort(val) {
 /**
  * Event listener for HTTP server "error" event.
  */
-function onError(error) {
+function onError(error: { syscall: string; code: string }) {
   if (error.syscall !== 'listen') {
     throw error
   }
@@ -59,11 +60,9 @@ function onError(error) {
     case 'EACCES':
       console.error(bind + ' requires elevated privileges')
       process.exit(1)
-      break
     case 'EADDRINUSE':
       console.error(bind + ' is already in use')
       process.exit(1)
-      break
     default:
       throw error
   }
@@ -74,6 +73,6 @@ function onError(error) {
  */
 function onListening() {
   let addr = server.address()
-  let bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
+  let bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr!.port
   debug('Listening on ' + bind)
 }
