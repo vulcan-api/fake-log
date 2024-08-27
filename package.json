@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start": "ts-node ./bin/www.ts & npm run scss",
+    "build": "tsc",
     "watch": "nodemon ./bin/www.ts & npm run scss",
     "scss": "sass --watch public/stylesheets",
     "prettier:write": "prettier . --write",
@@ -34,6 +35,7 @@
     "validate-polish": "^2.1.40"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.19.5",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/debug": "^4.1.12",
