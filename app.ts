@@ -5,7 +5,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import logger from 'morgan';
 import path from 'path';
 import protocol from './src/utils/connection';
-// const favicon = require('serve-favicon');
 import subdomain from 'express-subdomain';
 import api from './src/routes/api';
 import cufs from './src/routes/cufs';
@@ -23,8 +22,6 @@ const app = express();
 app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'pug');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
