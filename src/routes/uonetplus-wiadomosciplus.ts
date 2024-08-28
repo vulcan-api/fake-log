@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import protocol from '../utils/connection';
-// import { timestampToIsoTzFormat, dateToTimestamp } from '../utils/converter';
 import converter from '../utils/converter';
 import { fromString } from 'uuidv4';
 

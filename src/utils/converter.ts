@@ -2,16 +2,16 @@ import { addDays, toDate, format, getTime } from 'date-fns';
 const WEEK_TICK = 6048000000000;
 const DAY_TICK = 864000000000;
 
-function getDateFromTick(tick: string | number): Date {
+function getDateFromTick(tick: string): Date {
   if (tick === '' || tick === undefined) {
     return getMonday(new Date());
   }
 
-  return new Date(((tick as number) - 621355968000000000) / 10000);
+  return new Date(parseInt(tick) / 10000 - 62135596800000);
 }
 
 function getTickFromDate(date: Date): number {
-  return date.getTime() * 10000 + 621355968000000000;
+  return (date.getTime() + 62135596800000) * 10000;
 }
 
 function formatDate(today: Date, iso: boolean = false): string {
@@ -27,7 +27,8 @@ function formatDate(today: Date, iso: boolean = false): string {
   return `${datePrefix}${dd}.${monthPrefix}${mm}.${yyyy}`;
 }
 
-function timestampToIsoTzFormat(timestamp: EpochTimeStamp): string {
+type UnixTimestamp = number;
+function timestampToIsoTzFormat(timestamp: UnixTimestamp): string {
   return format(new Date(timestamp * 1000), "yyyy-MM-dd'T'HH:mm:ss.SSXXX");
 }
 

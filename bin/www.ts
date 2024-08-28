@@ -5,7 +5,6 @@
  */
 import app from '../app'
 import debug from 'debug'
-// ('fake-log:server')
 import http from 'http'
 
 /**
@@ -48,7 +47,8 @@ function normalizePort(val: string) {
 /**
  * Event listener for HTTP server "error" event.
  */
-function onError(error: { syscall: string; code: string }) {
+interface ListenError extends Error { syscall: string; code: string; };
+function onError(error: ListenError) {
   if (error.syscall !== 'listen') {
     throw error
   }

@@ -37,7 +37,6 @@ app.use(async (req: Request, res: Response, next: NextFunction) => {
   res.locals.currentHost = protocol(req) + '://' + req.get('host');
   res.locals.proto = protocol(req);
   res.locals.host = req.get('host')!.replace(/(api|cufs|uonetplus|uonetplus-opiekun|uonetplus-uzytkownik)\./, '');
-  /* The `!` operator is used to tell the (TypeScript) compiler that you are certain these values are not undefined. */
   res.cookie('UonetPlus_ASP.NET_SessionId', '', {
     httpOnly: true,
     domain: req.get('host'),

@@ -1,7 +1,7 @@
 import { Request } from 'express';
 
 export default function (req: Request) {
-  const isConnectionEncrypted = req.secure; // req.connection.encrypted is now req.secure
+  const isConnectionEncrypted = req.secure;
   const isSslEnvSet = process.env.SSL === 'true';
   const isHeaderSsl = req.header('x-forwarded-proto') === 'https';
 
