@@ -5,7 +5,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import logger from 'morgan';
 import path from 'path';
 import protocol from './src/utils/connection';
-// const favicon = require('serve-favicon');
 import subdomain from 'express-subdomain';
 import api from './src/routes/api';
 import cufs from './src/routes/cufs';
