@@ -1,6 +1,6 @@
-const { uuid } = require('uuidv4');
+import { uuid } from 'uuidv4';
 
-function createResponse(data) {
+export function createResponse<T>(data: T) {
   return {
     Status: 'Ok',
     TimeKey: Math.round(new Date().getTime() / 1000),
@@ -12,11 +12,10 @@ function createResponse(data) {
   };
 }
 
-function getRandomInt(min, max) {
+export function getRandomInt(min: number, max: number): number {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-exports.createResponse = createResponse;
-exports.getRandomInt = getRandomInt;
+export default { createResponse, getRandomInt };

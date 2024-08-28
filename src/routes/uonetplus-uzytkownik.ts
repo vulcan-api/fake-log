@@ -1,15 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const protocol = require('../utils/connection');
-const converter = require('../utils/converter');
-const { getRandomInt } = require('../utils/api');
-const md5 = require('md5');
+import { Request, Response, Router } from 'express';
+import md5 from 'md5';
+import { getRandomInt } from '../utils/api';
+import protocol from '../utils/connection';
+import converter from '../utils/converter';
 
-router.get('/', (req, res) => {
+const router = Router();
+router.get('/', (req: Request, res: Response) => {
   res.render('messages');
 });
 
-router.get('/-endpoints', (req, res) => {
+router.get('/-endpoints', (req: Request, res: Response) => {
   const base = protocol(req) + '://' + req.get('host') + '/powiatwulkanowy';
   res.json({
     status: 'sucess',
@@ -39,10 +39,10 @@ router.get('/-endpoints', (req, res) => {
   });
 });
 
-router.get('/Wiadomosc.mvc/GetInboxMessages', (req, res) => {
+router.get('/Wiadomosc.mvc/GetInboxMessages', async (req: Request, res: Response) => {
   res.json({
     success: true,
-    data: require('../../data/api/messages/WiadomosciOdebrane').map((item) => {
+    data: (await import('../../data/api/messages/WiadomosciOdebrane.json')).default.map((item) => {
       const recipientsNumber = getRandomInt(60, 100);
       const readBy = getRandomInt(20, 60);
       const unreadBy = recipientsNumber - readBy;
@@ -74,10 +74,10 @@ router.get('/Wiadomosc.mvc/GetInboxMessages', (req, res) => {
   });
 });
 
-router.get('/Wiadomosc.mvc/GetOutboxMessages', (req, res) => {
+router.get('/Wiadomosc.mvc/GetOutboxMessages', async (req: Request, res: Response) => {
   res.json({
     success: true,
-    data: require('../../data/api/messages/WiadomosciWyslane').map((item) => {
+    data: (await import('../../data/api/messages/WiadomosciWyslane.json')).default.map((item) => {
       return {
         Id: item.WiadomoscId * 2,
         Nieprzeczytana: !item.GodzinaPrzeczytania,
@@ -106,15 +106,15 @@ router.get('/Wiadomosc.mvc/GetOutboxMessages', (req, res) => {
   });
 });
 
-router.get('/Wiadomosc.mvc/GetTrashboxMessages', (req, res) => {
+router.get('/Wiadomosc.mvc/GetTrashboxMessages', async (req: Request, res: Response) => {
   res.json({
     success: true,
-    data: require('../../data/api/messages/WiadomosciUsuniete').map((item) => {
+    data: (await import('../../data/api/messages/WiadomosciUsuniete.json')).default.map((item) => {
       return {
         Id: item.WiadomoscId * 2,
         Nieprzeczytana: !item.GodzinaPrzeczytania,
-        Nieprzeczytane: parseInt(item.Nieprzeczytane, 10),
-        Przeczytane: parseInt(item.Przeczytane, 10),
+        Nieprzeczytane: parseInt(item.Nieprzeczytane || '0', 10), // originally defined as null in json
+        Przeczytane: parseInt(item.Przeczytane || '0', 10), // originally defined as null in json
         Data: converter.formatDate(new Date(item.DataWyslaniaUnixEpoch * 1000), true) + ' 00:00:00',
         Tresc: null,
         Temat: item.Tytul,
@@ -138,8 +138,8 @@ router.get('/Wiadomosc.mvc/GetTrashboxMessages', (req, res) => {
   });
 });
 
-router.get('/NowaWiadomosc.mvc/GetJednostkiUzytkownika', (req, res) => {
-  const user = require('../../data/api/ListaUczniow')[1];
+router.get('/NowaWiadomosc.mvc/GetJednostkiUzytkownika', async (req: Request, res: Response) => {
+  const user = (await import('../../data/api/ListaUczniow.json')).default[1];
   res.json({
     success: true,
     data: [
@@ -155,11 +155,11 @@ router.get('/NowaWiadomosc.mvc/GetJednostkiUzytkownika', (req, res) => {
   });
 });
 
-router.all('/Adresaci.mvc/GetAddressee', (req, res) => {
-  const user = require('../../data/api/ListaUczniow')[1];
+router.all('/Adresaci.mvc/GetAddressee', async (req: Request, res: Response) => {
+  const user = (await import('../../data/api/ListaUczniow.json')).default[1];
   res.json({
     success: true,
-    data: require('../../data/api/dictionaries/Pracownicy').map((item) => {
+    data: (await import('../../data/api/dictionaries/Pracownicy.json')).default.map((item) => {
       return {
         Id: `${item.Id}rPracownik`,
         Name: `${item.Imie} ${item.Nazwisko} [${item.Kod}] - pracownik (${user.JednostkaSprawozdawczaSkrot})`,
@@ -167,19 +167,19 @@ router.all('/Adresaci.mvc/GetAddressee', (req, res) => {
         UnitId: user.IdJednostkaSprawozdawcza,
         Role: 2,
         PushMessage: null,
-        Hash: Buffer.from(md5(item.Id)).toString('base64'),
+        Hash: Buffer.from(md5(item.Id.toString())).toString('base64'),
       };
     }),
   });
 });
 
-router.get(['/Wiadomosc.mvc/GetAdresaciWiadomosci', '/Wiadomosc.mvc/GetMessageSenderRoles'], (req, res) => {
-  const user = require('../../data/api/ListaUczniow')[1];
-  res.json({
-    success: true,
-    data: require('../../data/api/dictionaries/Pracownicy')
-      .slice(0, 2)
-      .map((item) => {
+router.get(
+  ['/Wiadomosc.mvc/GetAdresaciWiadomosci', '/Wiadomosc.mvc/GetMessageSenderRoles'],
+  async (req: Request, res: Response) => {
+    const user = (await import('../../data/api/ListaUczniow.json')).default[1];
+    res.json({
+      success: true,
+      data: (await import('../../data/api/dictionaries/Pracownicy.json')).default.slice(0, 2).map((item) => {
         return {
           Id: `${item.Id}rPracownik`,
           Name: `${item.Imie} ${item.Nazwisko} [${item.Kod}] - pracownik (${user.JednostkaSprawozdawczaSkrot})`,
@@ -187,11 +187,12 @@ router.get(['/Wiadomosc.mvc/GetAdresaciWiadomosci', '/Wiadomosc.mvc/GetMessageSe
           UnitId: null,
           Role: 2,
           PushMessage: null,
-          Hash: Buffer.from(md5(item.Id)).toString('base64'),
+          Hash: Buffer.from(md5(item.Id.toString())).toString('base64'),
         };
       }),
-  });
-});
+    });
+  }
+);
 
 router.all(
   [
@@ -199,8 +200,8 @@ router.all(
     '/Wiadomosc.mvc/GetOutboxMessageDetails',
     '/Wiadomosc.mvc/GetTrashboxMessageDetails',
   ],
-  (req, res) => {
-    const message = require('../../data/api/messages/WiadomosciOdebrane')[0];
+  async (req: Request, res: Response) => {
+    const message = (await import('../../data/api/messages/WiadomosciOdebrane.json')).default[0];
     res.json({
       success: true,
       data: {
@@ -234,9 +235,9 @@ router.all(
   }
 );
 
-router.all('/Wiadomosc.mvc/GetAdresaciNiePrzeczytaliWiadomosci', (req, res) => {
-  const user = require('../../data/api/ListaUczniow')[1];
-  const recipient = require('../../data/api/dictionaries/Pracownicy')[0];
+router.all('/Wiadomosc.mvc/GetAdresaciNiePrzeczytaliWiadomosci', async (req: Request, res: Response) => {
+  const user = (await import('../../data/api/ListaUczniow.json')).default[1];
+  const recipient = (await import('../../data/api/dictionaries/Pracownicy.json')).default[0];
   res.json({
     success: true,
     data: [
@@ -247,15 +248,15 @@ router.all('/Wiadomosc.mvc/GetAdresaciNiePrzeczytaliWiadomosci', (req, res) => {
         UnitId: user.IdJednostkaSprawozdawcza,
         Role: 2,
         PushMessage: null,
-        Hash: Buffer.from(md5(recipient.Id)).toString('base64'),
+        Hash: Buffer.from(md5(recipient.Id.toString())).toString('base64'),
       },
     ],
   });
 });
 
-router.all('/Wiadomosc.mvc/GetAdresaciPrzeczytaliWiadomosc', (req, res) => {
-  const user = require('../../data/api/ListaUczniow')[1];
-  const recipient = require('../../data/api/dictionaries/Pracownicy')[1];
+router.all('/Wiadomosc.mvc/GetAdresaciPrzeczytaliWiadomosc', async (req: Request, res: Response) => {
+  const user = (await import('../../data/api/ListaUczniow.json')).default[1];
+  const recipient = (await import('../../data/api/dictionaries/Pracownicy.json')).default[1];
   res.json({
     success: true,
     data: [
@@ -268,9 +269,9 @@ router.all('/Wiadomosc.mvc/GetAdresaciPrzeczytaliWiadomosc', (req, res) => {
   });
 });
 
-router.all('/Wiadomosc.mvc/GetMessageAddressee', (req, res) => {
-  const user = require('../../data/api/ListaUczniow')[1];
-  const recipient = require('../../data/api/dictionaries/Pracownicy')[1];
+router.all('/Wiadomosc.mvc/GetMessageAddressee', async (req: Request, res: Response) => {
+  const user = (await import('../../data/api/ListaUczniow.json')).default[1];
+  const recipient = (await import('../../data/api/dictionaries/Pracownicy.json')).default[1];
   res.json({
     success: true,
     data: [
@@ -291,19 +292,19 @@ router.all(
     '/Wiadomosc.mvc/DeleteOutboxMessages',
     '/Wiadomosc.mvc/DeleteTrashboxMessages',
   ],
-  (req, res) => {
+  (req: Request, res: Response) => {
     res.json({
       success: true,
     });
   }
 );
 
-router.all('/NowaWiadomosc.mvc/InsertWiadomosc', (req, res) => {
+router.all('/NowaWiadomosc.mvc/InsertWiadomosc', (req: Request, res: Response) => {
   let data = req.body.incomming;
   res.json({
     success: true,
     data: {
-      Adresaci: data.Adresaci.map((item) => {
+      Adresaci: data.Adresaci.map((item: { PushMessage: boolean }) => {
         item.PushMessage = false;
         return item;
       }),
@@ -324,4 +325,4 @@ router.all('/NowaWiadomosc.mvc/InsertWiadomosc', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

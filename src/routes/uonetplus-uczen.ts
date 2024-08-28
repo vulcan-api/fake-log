@@ -1,13 +1,12 @@
-const express = require('express');
-const router = express.Router({ mergeParams: true });
-const protocol = require('../utils/connection');
-const dictMap = require('../utils/dictMap');
-const converter = require('../utils/converter');
-const Tokens = require('csrf');
-const _ = require('lodash');
-const { getGradeColorByCategoryName } = require('../utils/gradeColor');
-const { validatePolish } = require('validate-polish');
-const {
+import { Router, Response, Request } from 'express';
+import protocol from '../utils/connection';
+import { getByValue } from '../utils/dictMap';
+import converter from '../utils/converter';
+import Tokens from 'csrf';
+import _ from 'lodash';
+import { getGradeColorByCategoryName } from '../utils/gradeColor';
+import { validatePolish } from 'validate-polish';
+import {
   format,
   fromUnixTime,
   getYear,
@@ -18,9 +17,10 @@ const {
   differenceInDays,
   parseISO,
   startOfWeek,
-} = require('date-fns');
+} from 'date-fns';
 
-router.get('/', (req, res) => {
+const router = Router({ mergeParams: true });
+router.get('/', (req: Request, res: Response) => {
   const base = protocol(req) + '://' + req.get('host') + '/powiatwulkanowy/123456';
   res.json({
     status: 'sucess',
@@ -74,32 +74,30 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/LoginEndpoint.aspx', (req, res) => {
+router.get('/LoginEndpoint.aspx', (req: Request, res: Response) => {
   res.redirect('/Start');
 });
 
-router.get('/Start', (req, res) => {
+router.get('/Start', (req: Request, res: Response) => {
   res.render('uczen/start');
 });
 
-router.all('/UczenCache.mvc/Get', (req, res) => {
+router.all('/UczenCache.mvc/Get', async (req: Request, res: Response) => {
   res.json({
     data: {
       czyOpiekun: false,
       czyJadlospis: false,
       czyOplaty: false,
-      poryLekcji: require('../../data/api/dictionaries/PoryLekcji').map((item) => {
-        return {
-          Id: item.Id,
-          Numer: item.Numer,
-          Poczatek: '1900-01-01 ' + item.PoczatekTekst + ':00',
-          Koniec: '1900-01-01 ' + item.KoniecTekst + ':00',
-          DataModyfikacji: '1900-01-01 00:00:00',
-          IdJednostkaSprawozdawcza: 1,
-          Nazwa: '' + item.Numer,
-          OkresDataOd: fromUnixTime(item.OkresDataOd),
-        };
-      }),
+      poryLekcji: (await import('../../data/api/dictionaries/PoryLekcji.json')).default.map((item) => ({
+        Id: item.Id,
+        Numer: item.Numer,
+        Poczatek: '1900-01-01 ' + item.PoczatekTekst + ':00',
+        Koniec: '1900-01-01 ' + item.KoniecTekst + ':00',
+        DataModyfikacji: '1900-01-01 00:00:00',
+        IdJednostkaSprawozdawcza: 1,
+        Nazwa: '' + item.Numer,
+        // OkresDataOd: fromUnixTime(item.OkresDataOd), // Does not exist in the json stored objects
+      })),
       pokazLekcjeZrealizowane: true,
       serverDate: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
     },
@@ -107,13 +105,14 @@ router.all('/UczenCache.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/UczenDziennik.mvc/Get', (req, res) => {
+router.all('/UczenDziennik.mvc/Get', async (req: Request, res: Response) => {
+  const students = (await import('../../data/api/ListaUczniow.json')).default;
   res.json({
-    data: require('../../data/api/ListaUczniow')
-      .reduce((res, current) => {
-        return res
+    data: students
+      .reduce<{ [key: string]: any }[]>((prev, current) => {
+        return prev
           .concat(Array(current.OkresPoziom).fill(current))
-          .map((item, i, array) => {
+          .map((item, i: number, array) => {
             return {
               // jshint ignore:start
               ...item,
@@ -175,7 +174,7 @@ router.all('/UczenDziennik.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/Autoryzacja.mvc/Post', (req, res) => {
+router.all('/Autoryzacja.mvc/Post', (req: Request, res: Response) => {
   res.json({
     data: {
       success: validatePolish.pesel(req.body.data?.Pesel ?? ''),
@@ -184,71 +183,71 @@ router.all('/Autoryzacja.mvc/Post', (req, res) => {
   });
 });
 
-router.all('/Home.mvc/RefreshSession', (req, res) => {
+router.all('/Home.mvc/RefreshSession', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/Diety.mvc/Get', (req, res) => {
+router.all('/Diety.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/EgzaminySemestralne.mvc/Get', (req, res) => {
+router.all('/EgzaminySemestralne.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/EgzaminyZewnetrzne.mvc/Get', (req, res) => {
+router.all('/EgzaminyZewnetrzne.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/EwidencjaObecnosci.mvc/Get', (req, res) => {
+router.all('/EwidencjaObecnosci.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/FormularzeSzablony.mvc/Get', (req, res) => {
+router.all('/FormularzeSzablony.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/FormularzeSzablonyDownload.mvc/Get', (req, res) => {
+router.all('/FormularzeSzablonyDownload.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/FormularzeWysylanie.mvc/Get', (req, res) => {
+router.all('/FormularzeWysylanie.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/FormularzeWysylanie.mvc/Post', (req, res) => {
+router.all('/FormularzeWysylanie.mvc/Post', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/Frekwencja.mvc/Get', (req, res) => {
-  const attendance = require('../../data/api/student/Frekwencje');
+router.all('/Frekwencja.mvc/Get', async (req: Request, res: Response) => {
+  const attendance = (await import('../../data/api/student/Frekwencje.json')).default;
   res.json({
     data: {
       UsprawiedliwieniaAktywne: true,
@@ -279,19 +278,30 @@ router.all('/Frekwencja.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/FrekwencjaStatystyki.mvc/Get', (req, res) => {
-  const attendance = require('../../data/opiekun/frekwencja-statystyki');
-  const sumStats = require('../../data/opiekun/frekwencja-statystyki').reduce((prev, current) => {
-    return {
-      presence: prev.presence + current.presence,
-      absence: prev.absence + current.absence,
-      absenceExcused: prev.absenceExcused + current.absenceExcused,
-      absenceForSchoolReasons: prev.absenceForSchoolReasons + current.absenceForSchoolReasons,
-      lateness: prev.lateness + current.lateness,
-      latenessExcused: prev.latenessExcused + current.latenessExcused,
-      exemption: prev.exemption + current.exemption,
-    };
-  });
+router.all('/FrekwencjaStatystyki.mvc/Get', async (req: Request, res: Response) => {
+  const attendance = (await import('../../data/opiekun/frekwencja-statystyki.json')).default;
+  const sumStats = attendance.reduce(
+    (prev, current) => {
+      return {
+        presence: prev.presence + current.presence,
+        absence: prev.absence + current.absence,
+        absenceExcused: prev.absenceExcused + current.absenceExcused,
+        absenceForSchoolReasons: prev.absenceForSchoolReasons + current.absenceForSchoolReasons,
+        lateness: prev.lateness + current.lateness,
+        latenessExcused: prev.latenessExcused + current.latenessExcused,
+        exemption: prev.exemption + current.exemption,
+      };
+    },
+    {
+      presence: 0,
+      absence: 0,
+      absenceExcused: 0,
+      absenceForSchoolReasons: 0,
+      lateness: 0,
+      latenessExcused: 0,
+      exemption: 0,
+    }
+  );
 
   res.json({
     data: {
@@ -307,7 +317,7 @@ router.all('/FrekwencjaStatystyki.mvc/Get', (req, res) => {
             10000
         ) / 100,
       Statystyki: [...Array(7).keys()].map((j) => {
-        const name = (i) => {
+        const name = (i: number) => {
           switch (i) {
             case 0:
               return 'Obecność';
@@ -325,7 +335,7 @@ router.all('/FrekwencjaStatystyki.mvc/Get', (req, res) => {
               return 'Zwolnienie';
           }
         };
-        const value = (month, i) => {
+        const value = (month: number, i: number) => {
           switch (i) {
             case 0:
               return attendance[month].presence;
@@ -366,8 +376,8 @@ router.all('/FrekwencjaStatystyki.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/FrekwencjaStatystykiPrzedmioty.mvc/Get', (req, res) => {
-  const subjects = require('../../data/api/dictionaries/Przedmioty').map((item) => {
+router.all('/FrekwencjaStatystykiPrzedmioty.mvc/Get', async (req: Request, res: Response) => {
+  const subjects = (await import('../../data/api/dictionaries/Przedmioty.json')).default.map((item) => {
     return {
       Id: item.Id,
       Nazwa: item.Nazwa,
@@ -393,15 +403,15 @@ router.all('/FrekwencjaStatystykiPrzedmioty.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/Jadlospis.mvc/Get', (req, res) => {
+router.all('/Jadlospis.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/LekcjeZrealizowane.mvc/GetPrzedmioty', (req, res) => {
-  const subjects = require('../../data/api/dictionaries/Przedmioty').map((item) => {
+router.all('/LekcjeZrealizowane.mvc/GetPrzedmioty', async (req: Request, res: Response) => {
+  const subjects = (await import('../../data/api/dictionaries/Przedmioty.json')).default.map((item) => {
     return {
       IdPrzedmiot: item.Id,
       Nazwa: item.Nazwa,
@@ -417,8 +427,8 @@ router.all('/LekcjeZrealizowane.mvc/GetPrzedmioty', (req, res) => {
   });
 });
 
-router.all('/LekcjeZrealizowane.mvc/GetZrealizowane', (req, res) => {
-  const realized = require('../../data/opiekun/plan-zrealizowane.json');
+router.all('/LekcjeZrealizowane.mvc/GetZrealizowane', async (req: Request, res: Response) => {
+  const realized = (await import('../../data/opiekun/plan-zrealizowane.json')).default;
   const requestDate = req.body.poczatek
     ? parseISO(req.body.poczatek.replace('T', ' ').replace(/Z$/, ''))
     : parseISO(realized[0].date);
@@ -446,25 +456,25 @@ router.all('/LekcjeZrealizowane.mvc/GetZrealizowane', (req, res) => {
   });
 });
 
-router.all('/Oceny.mvc/Get', (req, res) => {
-  const summary = require('../../data/api/student/OcenyPodsumowanie');
-  const teachers = require('../../data/api/dictionaries/Nauczyciele');
-  const subjectCategories = require('../../data/api/dictionaries/KategorieOcen');
-  const descriptiveGrades = require('../../data/api/student/OcenyOpisowe');
-
+router.all('/Oceny.mvc/Get', async (req: Request, res: Response) => {
+  const summary = (await import('../../data/api/student/OcenyPodsumowanie.json')).default;
+  const teachers = (await import('../../data/api/dictionaries/Nauczyciele.json')).default;
+  const subjectCategories = (await import('../../data/api/dictionaries/KategorieOcen.json')).default;
+  const descriptiveGrades = (await import('../../data/api/student/OcenyOpisowe.json')).default;
+  const grades = (await import('../../data/api/student/Oceny.json')).default;
   res.json({
     data: {
       IsSrednia: true,
       IsPunkty: true,
-      Oceny: require('../../data/api/dictionaries/Przedmioty').map((item, index) => {
+      Oceny: (await import('../../data/api/dictionaries/Przedmioty.json')).default.map((item, index) => {
         return {
           Przedmiot: item.Nazwa,
           Pozycja: item.Pozycja,
-          OcenyCzastkowe: require('../../data/api/student/Oceny')
+          OcenyCzastkowe: grades
             .filter((grade) => grade.IdPrzedmiot === item.Id)
             .map((item, index) => {
-              const teacher = dictMap.getByValue(teachers, 'Id', item.IdPracownikD);
-              const category = dictMap.getByValue(subjectCategories, 'Id', item.IdKategoria);
+              const teacher = getByValue(teachers, 'Id', item.IdPracownikD);
+              const category = getByValue(subjectCategories, 'Id', item.IdKategoria);
               let gradeDate;
 
               if (index == 0) {
@@ -483,19 +493,16 @@ router.all('/Oceny.mvc/Get', (req, res) => {
                 KolorOceny: parseInt(getGradeColorByCategoryName(category.Nazwa), 16),
               };
             }),
-          ProponowanaOcenaRoczna: dictMap.getByValue(summary.OcenyPrzewidywane, 'IdPrzedmiot', item.Id, {
+          ProponowanaOcenaRoczna: getByValue(summary.OcenyPrzewidywane, 'IdPrzedmiot', item.Id, {
             Wpis: '',
           }).Wpis,
-          OcenaRoczna: dictMap.getByValue(summary.OcenyKlasyfikacyjne, 'IdPrzedmiot', item.Id, { Wpis: '' }).Wpis,
+          OcenaRoczna: getByValue(summary.OcenyKlasyfikacyjne, 'IdPrzedmiot', item.Id, { Wpis: '' }).Wpis,
           ProponowanaOcenaRocznaPunkty: index * 2.5 + 1 + '',
           OcenaRocznaPunkty: index * 3 + 2 + '',
           Srednia: parseFloat(
-            dictMap
-              .getByValue(summary.SrednieOcen, 'IdPrzedmiot', item.Id, { SredniaOcen: '0' })
-              .SredniaOcen.replace(/,/, '.')
+            getByValue(summary.SrednieOcen, 'IdPrzedmiot', item.Id, { SredniaOcen: '0' }).SredniaOcen.replace(/,/, '.')
           ),
-          SumaPunktow: dictMap.getByValue(summary.SrednieOcen, 'IdPrzedmiot', item.Id, { SumaPunktow: null })
-            .SumaPunktow,
+          SumaPunktow: getByValue(summary.SrednieOcen, 'IdPrzedmiot', item.Id, { SumaPunktow: null }).SumaPunktow,
           WidocznyPrzedmiot: false,
         };
       }),
@@ -508,34 +515,35 @@ router.all('/Oceny.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/OkresyUmowOplat.mvc/Get', (req, res) => {
+router.all('/OkresyUmowOplat.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/Oplaty.mvc/Get', (req, res) => {
+router.all('/Oplaty.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/PlanZajec.mvc/Get', (req, res) => {
+router.all('/PlanZajec.mvc/Get', async (req: Request, res: Response) => {
   const requestDate = req.body.data
     ? parseISO(req.body.data.replace('T', ' ').replace(/Z$/, ''))
     : startOfWeek(new Date(), { weekStartsOn: 1 });
 
-  const teachers = require('../../data/api/dictionaries/Nauczyciele');
+  const teachers = (await import('../../data/api/dictionaries/Nauczyciele.json')).default;
+  const schedules = (await import('../../data/api/dictionaries/PoryLekcji.json')).default;
   const lessons = _.map(
     _.groupBy(
-      require('../../data/api/student/PlanLekcjiZeZmianami')
+      (await import('../../data/api/student/PlanLekcjiZeZmianami.json')).default
         .filter((item) => item.PlanUcznia)
         .map((item) => {
-          const teacher = dictMap.getByValue(teachers, 'Id', item.IdPracownik);
-          const oldTeacher = dictMap.getByValue(teachers, 'Id', item.IdPracownikOld);
-          const times = dictMap.getByValue(require('../../data/api/dictionaries/PoryLekcji'), 'Id', item.IdPoraLekcji);
+          const teacher = getByValue(teachers, 'Id', item.IdPracownik);
+          const oldTeacher = getByValue(teachers, 'Id', item.IdPracownikOld);
+          const times = getByValue(schedules, 'Id', item.IdPoraLekcji);
           return {
             number: item.NumerLekcji,
             id: item.IdPoraLekcji,
@@ -554,15 +562,15 @@ router.all('/PlanZajec.mvc/Get', (req, res) => {
         }),
       'number'
     ),
-    (number) => number.sort((a, b) => a.date - b.date)
+    (number) => number.sort((a, b) => a.date.getTime() - b.date.getTime())
   );
-
-  const earliestDay = new Date(_.minBy(_.flatten(_.values(lessons)), (i) => new Date(i.date)).date);
-  const latestDay = new Date(_.maxBy(_.flatten(_.values(lessons)), (i) => new Date(i.date)).date);
+  const dates = _.flatten(_.values(lessons));
+  const earliestDay = new Date(_.minBy(dates, (i) => new Date(i.date))!.date);
+  const latestDay = new Date(_.maxBy(dates, (i) => new Date(i.date))!.date);
 
   const rows = _.values(
     _.mapValues(lessons, (item) => {
-      const row = {
+      const row: { times: string; lessons: string[] } = {
         times: `${[item[0].number]}<br />${[item[0].start]}<br />${[item[0].end]}`,
         lessons: [],
       };
@@ -664,7 +672,7 @@ router.all('/PlanZajec.mvc/Get', (req, res) => {
         },
       ],
       Rows: rows.map((row) => [row.times, ...row.lessons]),
-      Additionals: require('../../data/opiekun/lekcje-dodatkowe').map((item) => {
+      Additionals: (await import('../../data/opiekun/lekcje-dodatkowe.json')).default.map((item) => {
         return {
           ...item,
           Header: `poniedziałek, ${converter.formatDate(addDays(requestDate, 0))}`,
@@ -675,8 +683,8 @@ router.all('/PlanZajec.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/PodrecznikiUcznia.mvc/Get', (req, res) => {
-  const manuals = require('../../data/opiekun/Podreczniki').map((item) => {
+router.all('/PodrecznikiUcznia.mvc/Get', async (req: Request, res: Response) => {
+  const manuals = (await import('../../data/opiekun/Podreczniki.json')).default.map((item) => {
     return {
       Opis: item.Opis,
       Tytul: item.Tytul,
@@ -696,8 +704,8 @@ router.all('/PodrecznikiUcznia.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/PodrecznikiLataSzkolne.mvc/Get', (req, res) => {
-  const manualsDate = require('../../data/opiekun/PodrecznikiLataSzkolne').map((item) => {
+router.all('/PodrecznikiLataSzkolne.mvc/Get', async (req: Request, res: Response) => {
+  const manualsDate = (await import('../../data/opiekun/PodrecznikiLataSzkolne.json')).default.map((item) => {
     return {
       Nazwa: item.Nazwa,
       Id: item.Id,
@@ -709,15 +717,15 @@ router.all('/PodrecznikiLataSzkolne.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/Pomoc.mvc/Get', (req, res) => {
+router.all('/Pomoc.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/RejestracjaUrzadzeniaToken.mvc/Get', (req, res) => {
-  const student = require('../../data/api/ListaUczniow')[1];
+router.all('/RejestracjaUrzadzeniaToken.mvc/Get', async (req: Request, res: Response) => {
+  const student = (await import('../../data/api/ListaUczniow.json')).default[1];
   const base = protocol(req) + '://' + req.get('host');
   const token = new Tokens({ secretLength: 97, saltLength: 4 });
   const secret = token.secretSync();
@@ -742,24 +750,24 @@ router.all('/RejestracjaUrzadzeniaToken.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/RejestracjaUrzadzeniaToken.mvc/Delete', (req, res) => {
+router.all('/RejestracjaUrzadzeniaToken.mvc/Delete', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/RejestracjaUrzadzeniaTokenCertyfikat.mvc/Get', (req, res) => {
+router.all('/RejestracjaUrzadzeniaTokenCertyfikat.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: true,
     success: true,
   });
 });
 
-router.all('/Sprawdziany.mvc/Get', (req, res) => {
-  const subjects = require('../../data/api/dictionaries/Przedmioty');
-  const teachers = require('../../data/api/dictionaries/Nauczyciele');
-  const exams = require('../../data/api/student/Sprawdziany');
+router.all('/Sprawdziany.mvc/Get', async (req: Request, res: Response) => {
+  const subjects = (await import('../../data/api/dictionaries/Przedmioty.json')).default;
+  const teachers = (await import('../../data/api/dictionaries/Nauczyciele.json')).default;
+  const exams = (await import('../../data/api/student/Sprawdziany.json')).default;
   const requestDate = req.body.data
     ? parseISO(req.body.data.replace('T', ' ').replace(/Z$/, ''))
     : parseISO(exams[0].DataTekst);
@@ -770,14 +778,14 @@ router.all('/Sprawdziany.mvc/Get', (req, res) => {
       return {
         SprawdzianyGroupedByDayList: converter.getWeekDaysFrom(addDays(requestDate, 7 * j), 7).map((day, i) => {
           return {
-            Data: converter.formatDate(day[2], true) + ' 00:00:00',
+            Data: converter.formatDate(new Date(day[2]), true) + ' 00:00:00',
             Sprawdziany: exams
               .filter((exam) => {
                 return 0 === differenceInDays(day[2], addDays(parseISO(exam.DataTekst), baseOffset + 7 * j));
               })
               .map((item) => {
-                const subject = dictMap.getByValue(subjects, 'Id', item.IdPrzedmiot);
-                const teacher = dictMap.getByValue(teachers, 'Id', item.IdPracownik);
+                const subject = getByValue(subjects, 'Id', item.IdPrzedmiot);
+                const teacher = getByValue(teachers, 'Id', item.IdPracownik);
 
                 return {
                   Nazwa: subject.Nazwa,
@@ -796,11 +804,11 @@ router.all('/Sprawdziany.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/Statystyki.mvc/GetOcenyCzastkowe', (req, res) => {
+router.all('/Statystyki.mvc/GetOcenyCzastkowe', async (req: Request, res: Response) => {
   let average = 2.0;
   let studentAverage = 3.0;
   res.json({
-    data: _.chain(require('../../data/opiekun/oceny-statystyki-czastkowe'))
+    data: _.chain((await import('../../data/opiekun/oceny-statystyki-czastkowe.json')).default)
       .groupBy('subject')
       .map((series, subject) => ({ subject, series }))
       .value()
@@ -836,9 +844,9 @@ router.all('/Statystyki.mvc/GetOcenyCzastkowe', (req, res) => {
   });
 });
 
-router.all('/Statystyki.mvc/GetOcenyRoczne', (req, res) => {
+router.all('/Statystyki.mvc/GetOcenyRoczne', async (req: Request, res: Response) => {
   res.json({
-    data: _.chain(require('../../data/opiekun/oceny-statystyki-roczne'))
+    data: _.chain((await import('../../data/opiekun/oceny-statystyki-roczne.json')).default)
       .groupBy('subject')
       .map((series, subject) => ({ subject, series }))
       .value()
@@ -859,24 +867,24 @@ router.all('/Statystyki.mvc/GetOcenyRoczne', (req, res) => {
   });
 });
 
-router.all('/Statystyki.mvc/GetPunkty', (req, res) => {
+router.all('/Statystyki.mvc/GetPunkty', async (req: Request, res: Response) => {
   res.json({
     data: {
       TableContent:
         '<table><thead><tr><th>Przedmiot</th><th>Uczeń</th><th>Średnia klasy</th></tr></thead><tbody></tbody></table>',
-      Items: require('../../data/opiekun/oceny-statystyki-punkty'),
+      Items: (await import('../../data/opiekun/oceny-statystyki-punkty.json')).default,
     },
     success: true,
   });
 });
 
-router.all('/SzkolaINauczyciele.mvc/Get', (req, res) => {
-  const teachers = require('../../data/api/student/Nauczyciele');
-  const subjectsDict = require('../../data/api/dictionaries/Przedmioty');
-  const teachersDict = require('../../data/api/dictionaries/Pracownicy');
+router.all('/SzkolaINauczyciele.mvc/Get', async (req: Request, res: Response) => {
+  const teachers = (await import('../../data/api/student/Nauczyciele.json')).default;
+  const subjectsDict = (await import('../../data/api/dictionaries/Przedmioty.json')).default;
+  const teachersDict = (await import('../../data/api/dictionaries/Pracownicy.json')).default;
 
-  const headmaster = dictMap.getByValue(teachersDict, 'Id', teachers.NauczycieleSzkola[0].IdPracownik);
-  const tutor = dictMap.getByValue(teachersDict, 'Id', teachers.NauczycieleSzkola[3].IdPracownik);
+  const headmaster = getByValue(teachersDict, 'Id', teachers.NauczycieleSzkola[0].IdPracownik);
+  const tutor = getByValue(teachersDict, 'Id', teachers.NauczycieleSzkola[3].IdPracownik);
   res.json({
     data: {
       Szkola: {
@@ -887,10 +895,10 @@ router.all('/SzkolaINauczyciele.mvc/Get', (req, res) => {
         Pedagog: `${tutor.Imie} ${tutor.Nazwisko}`,
         Id: 0,
       },
-      Nauczyciele: require('../../data/api/student/Nauczyciele').NauczycielePrzedmioty.map((item) => {
-        const teacher = dictMap.getByValue(teachersDict, 'Id', item.IdPracownik);
+      Nauczyciele: teachers.NauczycielePrzedmioty.map((item) => {
+        const teacher = getByValue(teachersDict, 'Id', item.IdPracownik);
         return {
-          Nazwa: dictMap.getByValue(subjectsDict, 'Id', item.IdPrzedmiot).Nazwa,
+          Nazwa: getByValue(subjectsDict, 'Id', item.IdPrzedmiot).Nazwa,
           Nauczyciel: `${teacher.Imie} ${teacher.Nazwisko} [${teacher.Kod}]`,
           Id: 0,
         };
@@ -901,21 +909,21 @@ router.all('/SzkolaINauczyciele.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/Uczen.mvc/Get', (req, res) => {
+router.all('/Uczen.mvc/Get', async (req: Request, res: Response) => {
   res.json({
-    data: require('../../data/opiekun/uczen.json'),
+    data: (await import('../../data/opiekun/uczen.json')).default,
     success: true,
   });
 });
 
-router.all('/UczenZdjecie.mvc/Get', (req, res) => {
+router.all('/UczenZdjecie.mvc/Get', async (req: Request, res: Response) => {
   res.json({
-    data: require('../../data/opiekun/uczen-zdjecie.json'),
+    data: (await import('../../data/opiekun/uczen-zdjecie.json')).default,
     success: true,
   });
 });
 
-router.all('/Usprawiedliwienia.mvc/Post', (req, res) => {
+router.all('/Usprawiedliwienia.mvc/Post', (req: Request, res: Response) => {
   res.json({
     data: {
       success: true,
@@ -924,19 +932,19 @@ router.all('/Usprawiedliwienia.mvc/Post', (req, res) => {
   });
 });
 
-router.all('/UwagiIOsiagniecia.mvc/Get', (req, res) => {
-  const categories = require('../../data/api/dictionaries/KategorieUwag');
-  const teachers = require('../../data/api/dictionaries/Pracownicy');
+router.all('/UwagiIOsiagniecia.mvc/Get', async (req: Request, res: Response) => {
+  const categories = (await import('../../data/api/dictionaries/KategorieUwag.json')).default;
+  const teachers = (await import('../../data/api/dictionaries/Pracownicy.json')).default;
   let i = 1;
   res.json({
     data: {
-      Uwagi: require('../../data/api/student/UwagiUcznia').map((item) => {
+      Uwagi: (await import('../../data/api/student/UwagiUcznia.json')).default.map((item) => {
         return {
           TrescUwagi: item.TrescUwagi,
-          Kategoria: dictMap.getByValue(categories, 'Id', item.IdKategoriaUwag).Nazwa,
+          Kategoria: getByValue(categories, 'Id', item.IdKategoriaUwag).Nazwa,
           DataWpisu: format(fromUnixTime(item.DataWpisu), 'yyyy-MM-dd HH:mm:ss'),
           Nauczyciel: `${item.PracownikImie} ${item.PracownikNazwisko} [${
-            dictMap.getByValue(teachers, 'Id', item.IdPracownik).Kod
+            getByValue(teachers, 'Id', item.IdPracownik).Kod
           }]`,
 
           // 19.06
@@ -955,10 +963,10 @@ router.all('/UwagiIOsiagniecia.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/Homework.mvc/Get', (req, res) => {
-  const subjects = require('../../data/api/dictionaries/Przedmioty');
-  const teachers = require('../../data/api/dictionaries/Nauczyciele');
-  const homework = require('../../data/api/student/ZadaniaDomowe');
+router.all('/Homework.mvc/Get', async (req: Request, res: Response) => {
+  const subjects = (await import('../../data/api/dictionaries/Przedmioty.json')).default;
+  const teachers = (await import('../../data/api/dictionaries/Nauczyciele.json')).default;
+  const homework = (await import('../../data/api/student/ZadaniaDomowe.json')).default;
   const requestDate = req.body.date
     ? parseISO(req.body.date.replace('T', ' ').replace(/Z$/, ''))
     : parseISO(homework[0].DataTekst);
@@ -974,7 +982,7 @@ router.all('/Homework.mvc/Get', (req, res) => {
             // return 0 === differenceInDays(addDays(requestDate, j), addDays(parseISO(item.DataTekst), baseOffset));
           })
           .map((item, index) => {
-            const teacher = dictMap.getByValue(teachers, 'Id', item.IdPracownik);
+            const teacher = getByValue(teachers, 'Id', item.IdPracownik);
             const attachments = [
               {
                 IdZadanieDomowe: index,
@@ -995,7 +1003,7 @@ router.all('/Homework.mvc/Get', (req, res) => {
             ];
             return {
               HomeworkId: index,
-              Subject: dictMap.getByValue(subjects, 'Id', item.IdPrzedmiot).Nazwa,
+              Subject: getByValue(subjects, 'Id', item.IdPrzedmiot).Nazwa,
               Teacher: `${teacher.Imie} ${teacher.Nazwisko} [${teacher.Kod}], ${converter.formatDate(
                 addDays(requestDate, j)
               )}`,
@@ -1022,39 +1030,39 @@ router.all('/Homework.mvc/Get', (req, res) => {
   });
 });
 
-router.all('/Zebrania.mvc/Get', (req, res) => {
+router.all('/Zebrania.mvc/Get', async (req: Request, res: Response) => {
   res.json({
-    data: require('../../data/opiekun/zebrania'),
+    data: (await import('../../data/opiekun/zebrania.json')).default,
     success: true,
   });
 });
 
-router.all('/ZarejestrowaneUrzadzenia.mvc/Get', (req, res) => {
+router.all('/ZarejestrowaneUrzadzenia.mvc/Get', async (req: Request, res: Response) => {
   res.json({
-    data: require('../../data/opiekun/zarejestrowane-urzadzenia'),
+    data: (await import('../../data/opiekun/zarejestrowane-urzadzenia.json')).default,
     success: true,
   });
 });
 
-router.all('/ZarejestrowaneUrzadzenia.mvc/Delete', (req, res) => {
+router.all('/ZarejestrowaneUrzadzenia.mvc/Delete', (req: Request, res: Response) => {
   res.json({
     data: null,
     success: true,
   });
 });
 
-router.all('/ZgloszoneNieobecnosci.mvc/Get', (req, res) => {
+router.all('/ZgloszoneNieobecnosci.mvc/Get', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-router.all('/ZgloszoneNieobecnosci.mvc/Post', (req, res) => {
+router.all('/ZgloszoneNieobecnosci.mvc/Post', (req: Request, res: Response) => {
   res.json({
     data: {},
     success: true,
   });
 });
 
-module.exports = router;
+export default router;

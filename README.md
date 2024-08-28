@@ -4,7 +4,7 @@
 
 Fake log for the Wulkanowy app. Used for testing.
 
-## Instalation
+## Installation
 
 ```bash
 $ npm install

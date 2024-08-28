@@ -1,22 +1,20 @@
-const express = require('express');
-const path = require('path');
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const protocol = require('./src/utils/connection');
-// const favicon = require('serve-favicon');
-
-const subdomain = require('express-subdomain');
-const index = require('./src/routes/index');
-const api = require('./src/routes/api');
-const cufs = require('./src/routes/cufs');
-const uonetplus = require('./src/routes/uonetplus');
-const uonetplusOpiekun = require('./src/routes/uonetplus-opiekun');
-const uonetplusUczen = require('./src/routes/uonetplus-uczen');
-const uonetplusUczenplus = require('./src/routes/uonetplus-uczenplus/index');
-const uonetplusUzytkownik = require('./src/routes/uonetplus-uzytkownik');
-const uonetplusWiadomosciplus = require('./src/routes/uonetplus-wiadomosciplus');
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express, { NextFunction, Request, Response } from 'express';
+import logger from 'morgan';
+import path from 'path';
+import protocol from './src/utils/connection';
+import subdomain from 'express-subdomain';
+import api from './src/routes/api';
+import cufs from './src/routes/cufs';
+import index from './src/routes/index';
+import uonetplus from './src/routes/uonetplus';
+import uonetplusOpiekun from './src/routes/uonetplus-opiekun';
+import uonetplusUczen from './src/routes/uonetplus-uczen';
+import uonetplusUczenplus from './src/routes/uonetplus-uczenplus/index';
+import uonetplusUzytkownik from './src/routes/uonetplus-uzytkownik';
+import uonetplusWiadomosciplus from './src/routes/uonetplus-wiadomosciplus';
 
 const app = express();
 
@@ -24,21 +22,18 @@ const app = express();
 app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'pug');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req, res, next) => {
-  res.locals.userInfo = require('./data/api/ListaUczniow')[1];
-  res.locals.uonetplusUrl = protocol(req) + '://' + req.get('host').replace('uonetplus-opiekun', 'uonetplus');
+app.use(async (req: Request, res: Response, next: NextFunction) => {
+  res.locals.userInfo = (await import('./data/api/ListaUczniow.json')).default[1];
+  res.locals.uonetplusUrl = protocol(req) + '://' + req.get('host')!.replace('uonetplus-opiekun', 'uonetplus');
   res.locals.currentHost = protocol(req) + '://' + req.get('host');
   res.locals.proto = protocol(req);
-  res.locals.host = req.get('host').replace(/(api|cufs|uonetplus|uonetplus-opiekun|uonetplus-uzytkownik)\./, '');
-
+  res.locals.host = req.get('host')!.replace(/(api|cufs|uonetplus|uonetplus-opiekun|uonetplus-uzytkownik)\./, '');
   res.cookie('UonetPlus_ASP.NET_SessionId', '', {
     httpOnly: true,
     domain: req.get('host'),
@@ -60,7 +55,7 @@ const corsOpt = {
 app.use(cors(corsOpt));
 app.options('*', cors(corsOpt));
 
-app.set('subdomain offset', +process.env.SUBDOMAIN_OFFSET || 2);
+app.set('subdomain offset', +process.env.SUBDOMAIN_OFFSET! || 2);
 app.use(subdomain('api', api));
 app.use(subdomain('cufs', cufs));
 app.use(subdomain('uonetplus', uonetplus));
@@ -77,15 +72,23 @@ app.use(
 );
 app.use('/', index);
 
+// Introduce a custom HttpError class to handle HTTP errors with a status code
+class HttpError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
-  const err = new Error('Not Found');
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const err = new HttpError('Not Found', 404);
   err.status = 404;
   next(err);
 });
 
 // error handler
-app.use((err, req, res, next) => {
+app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -95,8 +98,9 @@ app.use((err, req, res, next) => {
   res.render('error');
 });
 
-if (typeof PhusionPassenger !== 'undefined') {
+if (typeof (global as any).PhusionPassenger !== 'undefined') {
+  // Assuming that the PhusionPassenger variable is likely to be declared in the production stage automatically
   app.listen('passenger');
 }
 
-module.exports = app;
+export default app;

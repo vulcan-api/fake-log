@@ -1,6 +1,6 @@
-const { Router } = require('express');
-const protocol = require('../../utils/connection');
-const apiRouter = require('./api');
+import { Request, Response, Router } from 'express';
+import protocol from '../../utils/connection';
+import apiRouter from './api';
 
 const router = Router({ mergeParams: true });
 
@@ -40,26 +40,26 @@ router.get('/', (req, res) => {
   });
 });
 
-router.all('/LoginEndpoint.aspx', (req, res) => {
+router.all('/LoginEndpoint.aspx', (req: Request, res: Response) => {
   if (req.params.customerSymbol !== '123456')
     res.redirect(
       protocol(req) +
         '://' +
-        req.get('host').replace('uczenplus', 'uczen') +
+        req.get('host')!.replace('uczenplus', 'uczen') +
         `/powiatwulkanowy/${req.params.customerSymbol}/LoginEndpoint.aspx`
     );
   res.redirect(protocol(req) + '://' + req.get('host') + '/powiatwulkanowy/123456/App');
 });
 
-router.all('/App', (req, res) => {
+router.all('/App', (req: Request, res: Response) => {
   if (req.params.customerSymbol !== '123456')
     res.redirect(
       protocol(req) +
         '://' +
-        req.get('host').replace('uczenplus', 'uczen') +
+        req.get('host')!.replace('uczenplus', 'uczen') +
         `/powiatwulkanowy/${req.params.customerSymbol}/LoginEndpoint.aspx`
     );
   res.render('uczenplus/app');
 });
 
-module.exports = router;
+export default router;

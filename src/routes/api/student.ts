@@ -1,12 +1,14 @@
-const router = require('express').Router({});
-const { createEnvelope } = require('./utils');
-const { getTime, format } = require('date-fns');
+import { format, getTime } from 'date-fns';
+import { Router, Response, Request } from 'express';
+import { createEnvelope } from './utils';
 
-router.all('/version', (req, res) => {
+const router = Router({});
+
+router.all('/version', (req: Request, res: Response) => {
   res.json(createEnvelope(105, 'Podany czas jest nieprawidłowy', 'Object', null));
 });
 
-router.all('/internal/time', (req, res) => {
+router.all('/internal/time', (req: Request, res: Response) => {
   res.json(
     createEnvelope(0, 'OK', 'DateInfoPayload', {
       Date: format(new Date(), 'yyyy-MM-dd'),
@@ -17,8 +19,8 @@ router.all('/internal/time', (req, res) => {
   );
 });
 
-router.all('/heartbeat', (req, res) => {
+router.all('/heartbeat', (req: Request, res: Response) => {
   res.json(createEnvelope(0, 'OK', 'Boolean', true));
 });
 
-module.exports = router;
+export default router;

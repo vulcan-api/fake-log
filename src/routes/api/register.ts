@@ -1,8 +1,10 @@
-const router = require('express').Router({});
-const protocol = require('../../utils/connection');
-const { createEnvelope } = require('./utils');
+import { Router, Response, Request } from 'express';
+import protocol from '../../utils/connection';
+import { createEnvelope } from './utils';
 
-router.all('/new', (req, res) => {
+const router: Router = Router({});
+
+router.all('/new', (req: Request, res: Response) => {
   const base = protocol(req) + '://' + req.get('host');
 
   res.json(
@@ -15,7 +17,7 @@ router.all('/new', (req, res) => {
   );
 });
 
-router.all('/hebe', (req, res) => {
+router.all('/hebe', (req: Request, res: Response) => {
   res.json(
     createEnvelope(0, 'OK', 'IEnumerable`1', [
       {
@@ -226,4 +228,4 @@ router.all('/hebe', (req, res) => {
   );
 });
 
-module.exports = router;
+export default router;
