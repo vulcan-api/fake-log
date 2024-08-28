@@ -43,7 +43,7 @@ router.all('/App', (_req: Request, res: Response) => {
   res.render('uczenplus/app');
 });
 
-router.all('/api/Context', async(_req: Request, res: Response) => {
+router.all('/api/Context', async (_req: Request, res: Response) => {
   res.json((await import('../../data/uonetplus-uczenplus/Context.json')).default);
 });
 
